@@ -1,0 +1,48 @@
+{% extends 'main/layout.html' %}
+{% load static %}
+
+{% block main %}
+<section id="about" class="about">
+	<div class="container">
+
+		<div class="section-title">
+			<h2>Обо мне</h2>
+			<p>Я Python-разработчик с опытом разработки с 2022 года. Мой опыт работы также распространяется на работу и 
+				развертывание различных БД (Postgres, ClickHouse, Ignite), создание веб-приложений и API Django/DRF и Flask,
+				использование ORM Django и SQLAlchemy, асинхронное и многопоточное программирование, контейнеризация Docker/docker-compose.
+				В pet-проектах также использовал компьютерное зрение OpenCV и win32api.
+				Программирование является для меня не только работой, но и хобби, поэтому интерес и желание развиваться в этой сфере не угасает.
+			</p>
+		</div>
+
+		<div class="row">
+			<div class="col-lg-4" data-aos="fade-right">
+				<img src="{% static 'img/profile-img.jpg' %}" class="img-fluid" alt="">
+			</div>
+			<div class="col-lg-8 pt-4 pt-lg-0 content" data-aos="fade-left">
+				<h3>Python &amp; Базы данных &amp; Веб-разработка &amp; async/threading &amp; Docker.</h3>
+				<p class="fst-italic"></p>
+				<div class="row">
+					<div class="col-lg-6">
+						<ul>
+							<li><i class="fa-solid fa-angle-right"></i><strong>Phone:</strong><span>+7 (916) XXX XX-XX</span></li>
+							<li><i class="fa-solid fa-angle-right"></i><strong>Telegram:</strong><span><a href="https://t.me/BungaaFACE">@BungaaFACE</a></span></li>
+							<li><i class="fa-solid fa-angle-right"></i><strong>Email:</strong><span><a href="mailto:vladislav0218@gmail.com" class="email">vladislav0218@gmail.com</a></span></li>
+						</ul>
+					</div>
+				
+					<div class="col-lg-6">
+						<ul>
+							<li><i class="fa-solid fa-angle-right"></i></i> <strong>Город:</strong> <span>Москва</span></li>
+							<li><i class="fa-solid fa-angle-right"></i></i> <strong>Образование:</strong> <span>Бакалавр</span></li>
+							<li><i class="fa-solid fa-angle-right"></i><strong>Университет:</strong> <span>Московский технический университет связи и информатики</span></li>
+						</ul>
+					</div>
+				</div>
+				<p></p>
+			</div>
+		</div>
+	</div>
+</section>
+
+{% endblock %}

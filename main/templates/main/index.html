@@ -1,0 +1,18 @@
+{% extends 'main/layout.html' %}
+{% load static %}
+
+{% block main %}
+	<!-- ======= Hero Section ======= -->
+	<section id="main-page" class="d-flex flex-column justify-content-center align-items-center">
+		<div class="main-container" data-aos="fade-in">
+		<h1>Качура Владислав</h1>
+		
+			<p>I'm 
+				<a href="{% url 'main:about' %}">
+					<span>Python Developer</span>
+				</a>
+			</p>
+	</div>
+
+	</section><!-- End Hero -->
+{% endblock %}

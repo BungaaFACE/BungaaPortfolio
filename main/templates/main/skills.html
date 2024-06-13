@@ -1,0 +1,44 @@
+{% extends 'main/layout.html' %}
+{% load static %}
+
+{% block main %}
+<section id="skills" class="skills">
+    <div class="container">
+        <div class="section-title">
+			<h2>Скиллы</h2>
+            <p class="col-lg-8">
+                Мой стэк состоит из разных направлений, таких как 
+                веб-программирование, сбор и обработка данных,
+                автоматизация приложений и задач, создание TG-ботов.
+                Проценты означают совокупность степени ознакомления и 
+                количество опыта с данным фреймворком/модулем.
+            </p>
+		</div>
+
+        {% for category, skills in context.items %}
+        
+            {%if not forloop.counter|divisibleby:2 %}
+            <div class="row">
+            {% endif %}
+            
+            <div class="col-lg-6">
+            <h4>{{ category }}:</h4>
+            {% for skill in skills %}
+                <span class="skill">{{ skill.name }} <i class="val">{{ skill.percent }}%</i></span>
+                <div class="progress">
+                    <div class="progress-bar bg-info" style="width: {{ skill.percent }}%"></div>
+                </div>
+            {% endfor %}
+            </div>
+
+
+            {%if forloop.counter|divisibleby:2 %}
+            </div><br>
+            {% endif %}
+
+        {% endfor %}
+
+	</div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,93 @@
+{% extends 'main/layout.html' %}
+{% load static %}
+
+{% block main %}
+<section id="resume" class="resume">
+    <div class="container">
+        <div class="section-title">
+			<h2>Резюме</h2>
+            <p class="col-lg-8">
+                Мой стэк состоит из разных направлений, таких как 
+                веб-программирование, сбор и обработка данных,
+                автоматизация приложений и задач, создание TG-ботов.
+                Ссылку на HeadHunter можно найти 
+                <a href="https://hh.ru/resume/703e5766ff0d1b68230039ed1f4d73546e4d41">здесь</a>.
+            </p>
+		</div>
+
+        <div class="row">
+            
+            <div class="col-lg-6">
+                <h2>Основная информация</h2>
+                <div class="info-card">
+                    <h4>Качура Владислав</h4>
+                    <p>Я Python-разработчик с опытом программирования в Django, Flask, 
+                        работой с базами данных, сбора и обработки данных, автоматизации 
+                        приложений и создания Telegram-ботов
+                    </p>
+                    <ul>
+                        <li>+7 (916) XXX XX-XX</li>
+                        <li><a href="https://t.me/BungaaFACE" class="telegram">TG: @BungaaFACE</a></li>
+                        <li><a href="mailto:vladislav0218@gmail.com" class="email">vladislav0218@gmail.com</a></li>
+                    </ul>
+                </div>
+
+                <div class="info-card">
+                    <h4>Место проживания</h4>
+                    <p>г. Москва</p>
+                </div>
+
+                <div class="info-card">
+                    <h4>Образование</h4>
+                    <h5>Степень</h5>
+                    <p>Бакалавр</p>
+                    <h5>Университет</h5>
+                    <p>Московский Технический Университет Связи и Информатики</p>
+                </div>
+            </div>
+
+        <div class="col-lg-6">
+            <h2>Опыт работы</h2>
+            {% for exp in experience %}
+            <div class="info-card">
+                <h4>{{ exp.company_name }} (
+                    {% if exp.date_finish %}
+                    {{ exp.date_start }} - {{ exp.date_finish }}
+                    {% else %}
+                    {{ exp.date_start }} - nowadays
+                    {% endif %}
+                )</h4>
+                <p>{{ exp.description }}</p>
+
+                {% if exp.experienceproject_set.all %}
+                <h5>Проекты</h5>
+                    {% for proj in exp.experienceproject_set.all %}
+                        {% if proj.link %}
+                        <h6><a href="{{ proj.link }}">{{ proj.name }}</a></h6>
+                        {% else %}
+                        <h6>{{ proj.name }}</h6>
+                        {% endif %}
+                        <p>{{ proj.description }}</p>
+                        <p>Stack: {{ proj.stack }}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            {% endfor %}
+            {% comment %} <div class="info-card">
+                <h4>Company name</h4>
+                <p>Я занимался тем-то фффффффффффффффффффффффффффффффффф
+                    фффффффффффффффффффффффффффффффффффффффффффффф
+                    фффффффффффффффффффффффффффффффффф
+                </p>
+                <h5>Проекты</h5>
+                <h6>Проект 1</h6>
+                <p>Description
+                    Stack: xxxx</p>
+                </p>
+            </div> {% endcomment %}
+        </div>
+
+	</div>
+</section>
+
+{% endblock %}
