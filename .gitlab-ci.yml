@@ -1,0 +1,78 @@
+variables:
+  LXC_USER: "root"
+  PROJECT_NAME: "BungaaPortfolio"
+  PROJECT_DIR: "/data/$PROJECT_NAME"
+
+stages:
+  - init
+  - deploy
+
+
+.ct_prepare: &ct_prepare
+    - echo "LXC UPDATE && UPGRADE"
+    - ssh $LXC_USER@$REMOTE_SERVER "sudo apt update && sudo apt -y upgrade && sudo apt autoremove"
+    - echo "LXC PYTHON3-PIP INSTALL"
+    - ssh $LXC_USER@$REMOTE_SERVER "sudo apt -y install python3-pip python3.11-venv redis"
+    - echo "CREATING FOLDER IF NOT EXIST ON LXC"
+    - ssh $LXC_USER@$REMOTE_SERVER "mkdir -p $PROJECT_DIR"
+    - echo "CREATING VENV ON LXC"
+    - ssh $LXC_USER@$REMOTE_SERVER "/usr/bin/python3 -m venv $PROJECT_DIR/.venv"
+
+.service_prepare: &service_prepare
+    - echo "CREATING GUNICORN SERVICE"
+    - ssh $LXC_USER@$REMOTE_SERVER "echo \"\
+        [Unit]
+        Description=gunicorn $PROJECT_NAME
+        After=network.target
+        [Service]
+        User=$LXC_USER
+        WorkingDirectory=$PROJECT_DIR/
+        ExecStart=$PROJECT_DIR/.venv/bin/gunicorn config.wsgi -c $PROJECT_DIR/config/gunicorn.conf.py
+        [Install]
+        WantedBy=multi-user.target\" > /etc/systemd/system/gunicorn.service"
+    - echo "RESTARTING SYSTEMD DAEMON"
+    - ssh $LXC_USER@$REMOTE_SERVER "sudo systemctl daemon-reload"
+    - echo "ENABLING GUNICORN SERVICE"
+    - ssh $LXC_USER@$REMOTE_SERVER "sudo systemctl enable gunicorn.service"
+
+.update_script: &update_script
+    - echo "SENDING LAST VERSION TO LXC"
+    - /usr/bin/sftp $LXC_USER@$REMOTE_SERVER:* $PROJECT_DIR
+    - echo "INSTALLING REQUIREMENTS TO LXC"
+    - ssh $LXC_USER@$REMOTE_SERVER "$PROJECT_DIR/.venv/bin/pip install -r $PROJECT_DIR/requirements.txt"
+
+.django_pre: &django_pre
+    - echo "MIGRATING LAST DB CHANGES"
+    - ssh $LXC_USER@$REMOTE_SERVER "$PROJECT_DIR/.venv/bin/python $PROJECT_DIR/manage.py migrate"
+    - echo "COLLECTING DJANGO STATIC FILES"
+    - ssh $LXC_USER@$REMOTE_SERVER "$PROJECT_DIR/.venv/bin/python $PROJECT_DIR/manage.py collectstatic --noinput"
+    - echo "ADDING EXPERIENCE TO DB"
+    - ssh $LXC_USER@$REMOTE_SERVER "$PROJECT_DIR/.venv/bin/python $PROJECT_DIR/manage.py add_experience"
+    - echo "ADDING SKILLS TO DB"
+    - ssh $LXC_USER@$REMOTE_SERVER "$PROJECT_DIR/.venv/bin/python $PROJECT_DIR/manage.py add_skills"
+
+.restart_services: &restart_services
+    - echo "RESTARTING GUNICORN"
+    - ssh $LXC_USER@$REMOTE_SERVER "sudo systemctl restart gunicorn"
+
+
+init_lxc_job:
+  stage: init
+  tags:
+    - lxc_shell
+  script:
+    - *ct_prepare
+    - *service_prepare
+  allow_failure: false
+  when: manual
+
+deploy_job:
+  stage: deploy
+  tags:
+    - lxc_shell
+  script:
+    - *update_script
+    - *django_pre
+    - *restart_services
+  allow_failure: false
+  when: manual
