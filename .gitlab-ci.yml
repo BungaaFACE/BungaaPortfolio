@@ -1,78 +1,106 @@
 variables:
-  LXC_USER: "root"
+  CT_USER: "root"
   PROJECT_NAME: "BungaaPortfolio"
   PROJECT_DIR: "/data/$PROJECT_NAME"
+  REMOTE_SERVER: "192.168.1.254"
 
 stages:
   - init
   - deploy
+  - reset_db
 
+
+.ssh_prepare: &ssh_prepare
+    - ssh-keygen -R $REMOTE_SERVER && ssh-keyscan $REMOTE_SERVER >> ~/.ssh/known_hosts
 
 .ct_prepare: &ct_prepare
-    - echo "LXC UPDATE && UPGRADE"
-    - ssh $LXC_USER@$REMOTE_SERVER "sudo apt update && sudo apt -y upgrade && sudo apt autoremove"
-    - echo "LXC PYTHON3-PIP INSTALL"
-    - ssh $LXC_USER@$REMOTE_SERVER "sudo apt -y install python3-pip python3.11-venv redis"
-    - echo "CREATING FOLDER IF NOT EXIST ON LXC"
-    - ssh $LXC_USER@$REMOTE_SERVER "mkdir -p $PROJECT_DIR"
-    - echo "CREATING VENV ON LXC"
-    - ssh $LXC_USER@$REMOTE_SERVER "/usr/bin/python3 -m venv $PROJECT_DIR/.venv"
+    - echo "CT UPDATE && UPGRADE"
+    - ssh $CT_USER@$REMOTE_SERVER "sudo apt update && sudo apt -y upgrade && sudo apt autoremove"
+    - echo "CT PYTHON3-PIP INSTALL"
+    - ssh $CT_USER@$REMOTE_SERVER "sudo apt -y install python3-pip python3.11-venv redis"
+    - echo "CREATING FOLDER IF NOT EXIST ON CT"
+    - ssh $CT_USER@$REMOTE_SERVER "mkdir -p $PROJECT_DIR"
+    - echo "CREATING VENV ON CT"
+    - ssh $CT_USER@$REMOTE_SERVER "test -e $PROJECT_DIR/.venv || /usr/bin/python3 -m venv $PROJECT_DIR/.venv"
 
 .service_prepare: &service_prepare
     - echo "CREATING GUNICORN SERVICE"
-    - ssh $LXC_USER@$REMOTE_SERVER "echo \"\
+    - ssh $CT_USER@$REMOTE_SERVER "test -e /etc/systemd/system/gunicorn.service || echo \"\
         [Unit]
         Description=gunicorn $PROJECT_NAME
         After=network.target
         [Service]
-        User=$LXC_USER
+        User=$CT_USER
         WorkingDirectory=$PROJECT_DIR/
         ExecStart=$PROJECT_DIR/.venv/bin/gunicorn config.wsgi -c $PROJECT_DIR/config/gunicorn.conf.py
         [Install]
-        WantedBy=multi-user.target\" > /etc/systemd/system/gunicorn.service"
-    - echo "RESTARTING SYSTEMD DAEMON"
-    - ssh $LXC_USER@$REMOTE_SERVER "sudo systemctl daemon-reload"
-    - echo "ENABLING GUNICORN SERVICE"
-    - ssh $LXC_USER@$REMOTE_SERVER "sudo systemctl enable gunicorn.service"
+        WantedBy=multi-user.target\" > /etc/systemd/system/gunicorn.service && \
+        echo \"RESTARTING SYSTEMD DAEMON\" && sudo systemctl daemon-reload && \
+        echo \"ENABLING GUNICORN SERVICE\" && sudo systemctl enable gunicorn.service"
+
+.create_proxy: &create_proxy
+    - echo "CHECKING IF PROXY IS CREATED"
+    - /data/NginxProxyManagerHelper/.venv/bin/python NPMHelper.py --domain portfolio.bungaa-server.ru --forward_host $REMOTE_SERVER --forward_port 8000 --project_name $PROJECT_NAME
 
 .update_script: &update_script
-    - echo "SENDING LAST VERSION TO LXC"
-    - /usr/bin/sftp $LXC_USER@$REMOTE_SERVER:* $PROJECT_DIR
-    - echo "INSTALLING REQUIREMENTS TO LXC"
-    - ssh $LXC_USER@$REMOTE_SERVER "$PROJECT_DIR/.venv/bin/pip install -r $PROJECT_DIR/requirements.txt"
+    - echo "SENDING LAST VERSION TO CT"
+    - /usr/bin/sftp $CT_USER@$REMOTE_SERVER:* $PROJECT_DIR
+    - echo "INSTALLING REQUIREMENTS TO CT"
+    - ssh $CT_USER@$REMOTE_SERVER "$PROJECT_DIR/.venv/bin/pip install -r $PROJECT_DIR/requirements.txt"
 
 .django_pre: &django_pre
     - echo "MIGRATING LAST DB CHANGES"
-    - ssh $LXC_USER@$REMOTE_SERVER "$PROJECT_DIR/.venv/bin/python $PROJECT_DIR/manage.py migrate"
+    - ssh $CT_USER@$REMOTE_SERVER "$PROJECT_DIR/.venv/bin/python $PROJECT_DIR/manage.py migrate"
     - echo "COLLECTING DJANGO STATIC FILES"
-    - ssh $LXC_USER@$REMOTE_SERVER "$PROJECT_DIR/.venv/bin/python $PROJECT_DIR/manage.py collectstatic --noinput"
+    - ssh $CT_USER@$REMOTE_SERVER "$PROJECT_DIR/.venv/bin/python $PROJECT_DIR/manage.py collectstatic --noinput"
     - echo "ADDING EXPERIENCE TO DB"
-    - ssh $LXC_USER@$REMOTE_SERVER "$PROJECT_DIR/.venv/bin/python $PROJECT_DIR/manage.py add_experience"
+    - ssh $CT_USER@$REMOTE_SERVER "$PROJECT_DIR/.venv/bin/python $PROJECT_DIR/manage.py add_experience"
     - echo "ADDING SKILLS TO DB"
-    - ssh $LXC_USER@$REMOTE_SERVER "$PROJECT_DIR/.venv/bin/python $PROJECT_DIR/manage.py add_skills"
+    - ssh $CT_USER@$REMOTE_SERVER "$PROJECT_DIR/.venv/bin/python $PROJECT_DIR/manage.py add_skills"
 
 .restart_services: &restart_services
     - echo "RESTARTING GUNICORN"
-    - ssh $LXC_USER@$REMOTE_SERVER "sudo systemctl restart gunicorn"
+    - ssh $CT_USER@$REMOTE_SERVER "sudo systemctl restart gunicorn"
+
+.reset_db: &reset_db
+    - echo "DELETING EXISTING DB"
+    - ssh $CT_USER@$REMOTE_SERVER "rm $PROJECT_DIR/db.sqlite3"
+    - echo "MIGRATING LAST DB CHANGES"
+    - ssh $CT_USER@$REMOTE_SERVER "$PROJECT_DIR/.venv/bin/python $PROJECT_DIR/manage.py migrate"
+    - echo "ADDING EXPERIENCE TO DB"
+    - ssh $CT_USER@$REMOTE_SERVER "$PROJECT_DIR/.venv/bin/python $PROJECT_DIR/manage.py add_experience"
+    - echo "ADDING SKILLS TO DB"
+    - ssh $CT_USER@$REMOTE_SERVER "$PROJECT_DIR/.venv/bin/python $PROJECT_DIR/manage.py add_skills"
 
 
-init_lxc_job:
+init_CT_job:
   stage: init
   tags:
-    - lxc_shell
+    - ct_shell
   script:
+    - *ssh_prepare
     - *ct_prepare
     - *service_prepare
+    - *create_proxy
   allow_failure: false
   when: manual
 
 deploy_job:
   stage: deploy
   tags:
-    - lxc_shell
+    - ct_shell
   script:
     - *update_script
     - *django_pre
     - *restart_services
+  allow_failure: false
+  when: manual
+
+reset_db_job:
+  stage: reset_db
+  tags:
+    - ct_shell
+  script:
+    - *reset_db
   allow_failure: false
   when: manual
