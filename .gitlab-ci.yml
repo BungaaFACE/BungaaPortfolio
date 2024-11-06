@@ -39,7 +39,7 @@ stages:
         [Service]
         User=$CT_USER
         WorkingDirectory=$PROJECT_DIR/
-        ExecStart=$PROJECT_DIR/.venv/bin/gunicorn config.wsgi -c $PROJECT_DIR/config/gunicorn.conf.py
+        ExecStart=./.venv/bin/gunicorn config.wsgi -c ./config/gunicorn.conf.py
         [Install]
         WantedBy=multi-user.target\"
         EOF" && echo "RESTARTING SYSTEMD DAEMON" && 
@@ -59,13 +59,13 @@ stages:
 
 .django_pre: &django_pre
     - echo "MIGRATING LAST DB CHANGES"
-    - $SSH_COMMAND "$PROJECT_DIR/.venv/bin/python $PROJECT_DIR/manage.py migrate"
+    - $SSH_COMMAND "cd $PROJECT_DIR && ./.venv/bin/python manage.py migrate"
     - echo "COLLECTING DJANGO STATIC FILES"
-    - $SSH_COMMAND "$PROJECT_DIR/.venv/bin/python $PROJECT_DIR/manage.py collectstatic --noinput"
+    - $SSH_COMMAND "cd $PROJECT_DIR && ./.venv/bin/python manage.py collectstatic --noinput"
     - echo "ADDING EXPERIENCE TO DB"
-    - $SSH_COMMAND "$PROJECT_DIR/.venv/bin/python $PROJECT_DIR/manage.py add_experience"
+    - $SSH_COMMAND "cd $PROJECT_DIR && ./.venv/bin/python manage.py add_experience"
     - echo "ADDING SKILLS TO DB"
-    - $SSH_COMMAND "$PROJECT_DIR/.venv/bin/python $PROJECT_DIR/manage.py add_skills"
+    - $SSH_COMMAND "cd $PROJECT_DIR && ./.venv/bin/python manage.py add_skills"
 
 .restart_services: &restart_services
     - echo "RESTARTING GUNICORN"
@@ -75,11 +75,11 @@ stages:
     - echo "DELETING EXISTING DB"
     - $SSH_COMMAND "rm $PROJECT_DIR/db.sqlite3"
     - echo "MIGRATING LAST DB CHANGES"
-    - $SSH_COMMAND "$PROJECT_DIR/.venv/bin/python $PROJECT_DIR/manage.py migrate"
+    - $SSH_COMMAND "cd $PROJECT_DIR && ./.venv/bin/python manage.py migrate"
     - echo "ADDING EXPERIENCE TO DB"
-    - $SSH_COMMAND "$PROJECT_DIR/.venv/bin/python $PROJECT_DIR/manage.py add_experience"
+    - $SSH_COMMAND "cd $PROJECT_DIR && ./.venv/bin/python manage.py add_experience"
     - echo "ADDING SKILLS TO DB"
-    - $SSH_COMMAND "$PROJECT_DIR/.venv/bin/python $PROJECT_DIR/manage.py add_skills"
+    - $SSH_COMMAND "cd $PROJECT_DIR && ./.venv/bin/python manage.py add_skills"
 
 
 init_CT_job:
