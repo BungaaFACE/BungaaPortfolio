@@ -41,8 +41,9 @@ stages:
         WorkingDirectory=$PROJECT_DIR/
         ExecStart=./.venv/bin/gunicorn config.wsgi -c ./config/gunicorn.conf.py
         [Install]
-        WantedBy=multi-user.target\"
-        EOF" && echo "RESTARTING SYSTEMD DAEMON" && 
+        WantedBy=multi-user.target
+        EOF" && 
+        echo "RESTARTING SYSTEMD DAEMON" && 
         $SSH_COMMAND "sudo systemctl daemon-reload" && 
         echo "ENABLING GUNICORN SERVICE" && 
         $SSH_COMMAND "sudo systemctl enable gunicorn.service"
