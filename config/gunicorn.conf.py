@@ -1,3 +1,3 @@
-bind = f'127.0.0.1:8000'
+bind = f'0.0.0.0:8000'
 workers = 8
 loglevel = 'INFO'

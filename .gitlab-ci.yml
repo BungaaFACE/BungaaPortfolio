@@ -37,6 +37,7 @@ stages:
         Description=gunicorn $PROJECT_NAME
         After=network.target
         [Service]
+        Environment="PROD=True"
         User=$CT_USER
         WorkingDirectory=$PROJECT_DIR/
         ExecStart=$PROJECT_DIR/.venv/bin/gunicorn config.wsgi -c $PROJECT_DIR/config/gunicorn.conf.py
