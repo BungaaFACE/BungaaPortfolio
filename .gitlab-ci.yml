@@ -53,7 +53,7 @@ stages:
 
 .update_script: &update_script
     - echo "SENDING LAST VERSION TO CT"
-    - /usr/bin/sftp $CT_USER@$REMOTE_SERVER:$PROJECT_DIR/ <<< $'put ./*'
+    - /usr/bin/sftp -r $CT_USER@$REMOTE_SERVER:$PROJECT_DIR/ <<< $'put ./*'
     - echo "INSTALLING REQUIREMENTS TO CT"
     - ssh $CT_USER@$REMOTE_SERVER "$PROJECT_DIR/.venv/bin/pip install -r $PROJECT_DIR/requirements.txt"
 
