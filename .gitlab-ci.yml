@@ -37,6 +37,7 @@ stages:
         Description=gunicorn $PROJECT_NAME
         After=network.target
         [Service]
+        Environment="LANG=ru_RU.UTF-8"
         Environment="PROD=True"
         User=$CT_USER
         WorkingDirectory=$PROJECT_DIR/
