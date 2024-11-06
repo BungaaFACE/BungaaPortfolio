@@ -2,7 +2,7 @@ variables:
   CT_USER: "root"
   PROJECT_NAME: "BungaaPortfolio"
   PROJECT_DIR: "/data/$PROJECT_NAME"
-  REMOTE_SERVER: "192.168.1.254"
+  REMOTE_SERVER: "172.0.0.107"
   SSH_COMMAND: "ssh $CT_USER@$REMOTE_SERVER"
 
 stages:
@@ -13,7 +13,8 @@ stages:
 
 .ssh_prepare: &ssh_prepare
     - mkdir -p ~/.ssh && touch ~/.ssh/known_hosts
-    - ssh-keygen -R $REMOTE_SERVER && ssh-keyscan $REMOTE_SERVER >> ~/.ssh/known_hosts
+    - grep "$REMOTE_SERVER" ~/.ssh/known_hosts && ssh-keygen -R $REMOTE_SERVER || true
+    - ssh-keyscan $REMOTE_SERVER >> ~/.ssh/known_hosts
     - eval "$(ssh-agent -s)" && ssh-add ~/.ssh/id_rsa
 
 .ct_prepare: &ct_prepare
