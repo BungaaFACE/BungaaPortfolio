@@ -4,6 +4,8 @@ variables:
   PROJECT_DIR: "/data/$PROJECT_NAME"
   REMOTE_SERVER: "172.0.0.107"
   SSH_COMMAND: "ssh $CT_USER@$REMOTE_SERVER"
+  NPM_HELPER_USER: "root" # USER OF VM WITH NPMHelper
+  NPM_HELPER_IP: "172.0.0.106" # IP OF VM WITH NPMHelper (MUST BE AVAILABLE FROM RUNNER VM)
 
 stages:
   - init
@@ -46,8 +48,8 @@ stages:
         $SSH_COMMAND "sudo systemctl enable gunicorn.service"
 
 .create_proxy: &create_proxy
-    - echo "CHECKING IF PROXY IS CREATED"
-    - /data/NginxProxyManagerHelper/.venv/bin/python NPMHelper.py --domain portfolio.bungaa-server.ru --forward_host $REMOTE_SERVER --forward_port 8000 --project_name $PROJECT_NAME
+    - echo "CHECKING IF PROXY IS CREATED"- echo "CREATING PROXY IF NOT EXISTS"
+    - ssh $NPM_HELPER_USER@$NPM_HELPER_IP "/data/NginxProxyManagerHelper/.venv/bin/python /data/NginxProxyManagerHelper/NPMHelper.py --domain portfolio.bungaa-server.ru --forward_host $REMOTE_SERVER --forward_port 8000 --project_name $PROJECT_NAME"
 
 .update_script: &update_script
     - echo "SENDING LAST VERSION TO CT"
