@@ -27,6 +27,22 @@ class Command(BaseCommand):
 - Придумал и написал архитектуру структуризации и автоматизации DPI;
 - Написал преобразователь конфигурации оборудования с одного вендора на другого;
 - Работал с данными в БД Vertica, ClickHouse;''',
+            date_start = date(2022, 8, 20),
+            date_finish = date(2024, 4, 12)
+        )
+
+        mts_digital, _ = Experience.objects.get_or_create(
+            company_name = 'МТС Диджитал',
+            vacancy_name = 'Ведущий разработчик (Middle Developer)',
+            description = '''- Написал Flask приложение для потребителей проекта;
+- Создал клиента Diameter с последующим анализом данных и записью в БД ignite;
+- Создал sftp интерфейс для записи напрямую в S3 minio (без записи во внутреннюю память);
+- Автоматизировал CICD для развертывания/обновления приложений;
+- Перенес структуры проекта в Docker(Podman) compose;
+- Настройка и развертывание loguru + fluent-bit + grafana loki для анализа логов;
+- Автоматизирование тестов Allure TestOps через Gitlab pipeline;
+- Использовал Theading, asyncio, concurrent для ускорения приложений с IO задачами; 
+- Работа с данными в БД ClickHouse, Ignite;''',
             date_start = date(2022, 8, 20)
         )
 
