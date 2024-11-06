@@ -51,7 +51,7 @@ stages:
         $SSH_COMMAND "sudo systemctl enable gunicorn.service"
 
 .create_proxy: &create_proxy
-    - echo "CHECKING IF PROXY IS CREATED"- echo "CREATING PROXY IF NOT EXISTS"
+    - echo "CREATING PROXY IF NOT EXISTS"
     - ssh $NPM_HELPER_USER@$NPM_HELPER_IP "/data/NginxProxyManagerHelper/.venv/bin/python /data/NginxProxyManagerHelper/NPMHelper.py --domain portfolio.bungaa-server.ru --forward_host $REMOTE_SERVER --forward_port 8000 --project_name $PROJECT_NAME"
 
 .update_script: &update_script
