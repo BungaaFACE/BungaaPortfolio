@@ -90,6 +90,7 @@ init_CT_job:
     - *service_prepare
     - *create_proxy
   allow_failure: false
+  needs: []
   when: manual
 
 deploy_job:
@@ -101,6 +102,7 @@ deploy_job:
     - *django_pre
     - *restart_services
   allow_failure: false
+  needs: []
   when: manual
 
 reset_db_job:
@@ -110,4 +112,5 @@ reset_db_job:
   script:
     - *reset_db
   allow_failure: false
+  needs: []
   when: manual
