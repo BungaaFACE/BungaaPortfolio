@@ -39,7 +39,7 @@ stages:
         [Service]
         User=$CT_USER
         WorkingDirectory=$PROJECT_DIR/
-        ExecStart=./.venv/bin/gunicorn config.wsgi -c ./config/gunicorn.conf.py
+        ExecStart=.venv/bin/gunicorn config.wsgi -c config/gunicorn.conf.py
         [Install]
         WantedBy=multi-user.target
         EOF" && 
