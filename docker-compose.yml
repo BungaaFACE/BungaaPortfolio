@@ -1,0 +1,26 @@
+services:
+  django:
+    build:
+      context: .
+      dockerfile: ./docker/django.dockerfile
+    container_name: django
+    restart: always
+    volumes:
+      - /data/logs:/data/logs
+      - /data/staticfiles:/data/staticfiles
+      - /data/db:/data/db
+    expose:
+      - "8000"
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    restart: always
+    expose:
+      - "8000"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./docker/nginx.conf:/etc/nginx/nginx.conf
+      - /data/logs:/data/logs
+      - /data/staticfiles:/data/staticfiles

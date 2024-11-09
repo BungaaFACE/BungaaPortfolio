@@ -1,7 +1,5 @@
 variables:
   CT_USER: "root"
-  PROJECT_NAME: "BungaaPortfolio"
-  PROJECT_DIR: "/data/$PROJECT_NAME"
   REMOTE_SERVER: "172.0.0.107"
   SSH_COMMAND: "ssh $CT_USER@$REMOTE_SERVER"
   NPM_HELPER_USER: "root" # USER OF VM WITH NPMHelper
@@ -22,67 +20,30 @@ stages:
 .ct_prepare: &ct_prepare
     - echo "CT UPDATE && UPGRADE"
     - $SSH_COMMAND "sudo apt update && sudo apt -y upgrade && sudo apt -y autoremove"
-    - echo "CT PYTHON3-PIP INSTALL"
-    - $SSH_COMMAND "sudo apt -y install python3-pip python3.11-venv redis git"
+    - echo "CT PODMAN INSTALL"
+    - $SSH_COMMAND "sudo apt -y install podman-docker"
+    - echo "CT ENABLING PODMAN"
+    - $SSH_COMMAND "sudo systemctl enable --now podman"
     - echo "CREATING FOLDER IF NOT EXIST ON CT"
-    - $SSH_COMMAND "mkdir -p $PROJECT_DIR"
-    - echo "CREATING VENV ON CT"
-    - $SSH_COMMAND "test -e $PROJECT_DIR/.venv || /usr/bin/python3 -m venv $PROJECT_DIR/.venv"
-
-.service_prepare: &service_prepare
-    - echo "CREATING GUNICORN SERVICE"
-    - |
-        $SSH_COMMAND "sudo test -e /etc/systemd/system/gunicorn.service || sudo tee /etc/systemd/system/gunicorn.service > /dev/null << EOF
-        [Unit]
-        Description=gunicorn $PROJECT_NAME
-        After=network.target
-        [Service]
-        Environment="LANG=ru_RU.UTF-8"
-        Environment="PROD=True"
-        User=$CT_USER
-        WorkingDirectory=$PROJECT_DIR/
-        ExecStart=$PROJECT_DIR/.venv/bin/gunicorn config.wsgi -c $PROJECT_DIR/config/gunicorn.conf.py
-        [Install]
-        WantedBy=multi-user.target
-        EOF" && 
-        echo "RESTARTING SYSTEMD DAEMON" && 
-        $SSH_COMMAND "sudo systemctl daemon-reload" && 
-        echo "ENABLING GUNICORN SERVICE" && 
-        $SSH_COMMAND "sudo systemctl enable gunicorn.service"
+    - $SSH_COMMAND "mkdir -p /data/logs /data/db /data/staticfiles"
 
 .create_proxy: &create_proxy
     - echo "CREATING PROXY IF NOT EXISTS"
-    - ssh $NPM_HELPER_USER@$NPM_HELPER_IP "/data/NginxProxyManagerHelper/.venv/bin/python /data/NginxProxyManagerHelper/NPMHelper.py --domain portfolio.bungaa-server.ru --forward_host $REMOTE_SERVER --forward_port 8000 --project_name $PROJECT_NAME"
+    - ssh $NPM_HELPER_USER@$NPM_HELPER_IP "/data/NginxProxyManagerHelper/.venv/bin/python /data/NginxProxyManagerHelper/NPMHelper.py --domain portfolio.bungaa-server.ru --forward_host $REMOTE_SERVER --forward_port 8000"
 
 .update_script: &update_script
     - echo "SENDING LAST VERSION TO CT"
-    - /usr/bin/sftp -r $CT_USER@$REMOTE_SERVER:$PROJECT_DIR/ <<< $'put ./*'
-    - echo "INSTALLING REQUIREMENTS TO CT"
-    - ssh $CT_USER@$REMOTE_SERVER "$PROJECT_DIR/.venv/bin/pip install -r $PROJECT_DIR/requirements.txt"
+    - /usr/bin/sftp -r $CT_USER@$REMOTE_SERVER:/data/docker/ <<< $'put ./*'
 
-.django_pre: &django_pre
-    - echo "MIGRATING LAST DB CHANGES"
-    - $SSH_COMMAND "cd $PROJECT_DIR && ./.venv/bin/python manage.py migrate"
-    - echo "COLLECTING DJANGO STATIC FILES"
-    - $SSH_COMMAND "cd $PROJECT_DIR && ./.venv/bin/python manage.py collectstatic --noinput"
-    - echo "ADDING EXPERIENCE TO DB"
-    - $SSH_COMMAND "cd $PROJECT_DIR && ./.venv/bin/python manage.py add_experience"
-    - echo "ADDING SKILLS TO DB"
-    - $SSH_COMMAND "cd $PROJECT_DIR && ./.venv/bin/python manage.py add_skills"
-
-.restart_services: &restart_services
-    - echo "RESTARTING GUNICORN"
-    - $SSH_COMMAND "sudo systemctl restart gunicorn"
+.restart_containers: &restart_containers
+    - echo "RESTARTING CONTAINERS"
+    - $SSH_COMMAND "sudo docker-compose -f /data/docker/docker-compose.yml down"
+    - $SSH_COMMAND "sudo docker-compose -f /data/docker/docker-compose.yml build"
+    - $SSH_COMMAND "sudo docker-compose -f /data/docker/docker-compose.yml up -d"
 
 .reset_db: &reset_db
     - echo "DELETING EXISTING DB"
-    - $SSH_COMMAND "rm $PROJECT_DIR/db.sqlite3"
-    - echo "MIGRATING LAST DB CHANGES"
-    - $SSH_COMMAND "cd $PROJECT_DIR && ./.venv/bin/python manage.py migrate"
-    - echo "ADDING EXPERIENCE TO DB"
-    - $SSH_COMMAND "cd $PROJECT_DIR && ./.venv/bin/python manage.py add_experience"
-    - echo "ADDING SKILLS TO DB"
-    - $SSH_COMMAND "cd $PROJECT_DIR && ./.venv/bin/python manage.py add_skills"
+    - $SSH_COMMAND "rm -r /data/db/*"
 
 
 init_CT_job:
@@ -92,8 +53,6 @@ init_CT_job:
   script:
     - *ssh_prepare
     - *ct_prepare
-    - *service_prepare
-    - *create_proxy
   allow_failure: false
   needs: []
   when: manual
@@ -104,8 +63,7 @@ deploy_job:
     - ct_shell
   script:
     - *update_script
-    - *django_pre
-    - *restart_services
+    - *restart_containers
   allow_failure: false
   needs: []
   when: manual
@@ -116,6 +74,7 @@ reset_db_job:
     - ct_shell
   script:
     - *reset_db
+    - *restart_containers
   allow_failure: false
   needs: []
   when: manual

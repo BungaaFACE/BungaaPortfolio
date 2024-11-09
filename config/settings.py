@@ -14,7 +14,7 @@ SECRET_KEY = 'django-insecure-d#8d#^8j*&q99w!x58ngz*q#k0kg5^w-+0&$amxt6kzhj_gdk=
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('PROD', 'False').title() != 'True'
 
-ALLOWED_HOSTS = [] if DEBUG else ['portfolio.bungaa-server.ru']
+ALLOWED_HOSTS = [] if DEBUG else ['portfolio.bungaa-server.ru', '127.0.0.1']
 
 
 # Application definition
@@ -67,7 +67,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': BASE_DIR / 'db' / 'db.sqlite3', # Folder for mount only db file
     }
 }
 
@@ -108,6 +108,9 @@ USE_TZ = True
 
 STATIC_URL = 'staticfiles/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
