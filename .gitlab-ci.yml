@@ -25,7 +25,7 @@ stages:
     - echo "CT ENABLING PODMAN"
     - $SSH_COMMAND "sudo systemctl enable --now podman"
     - echo "CREATING FOLDER IF NOT EXIST ON CT"
-    - $SSH_COMMAND "mkdir -p /data/logs /data/db /data/staticfiles"
+    - $SSH_COMMAND "mkdir -p /data/logs /data/db /data/staticfiles /data/docker"
 
 .create_proxy: &create_proxy
     - echo "CREATING PROXY IF NOT EXISTS"
