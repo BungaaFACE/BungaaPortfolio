@@ -1,4 +1,4 @@
-FROM python:latest
+FROM python:3
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
@@ -10,5 +10,4 @@ RUN python manage.py collectstatic --noinput
 RUN python manage.py add_experience
 RUN python manage.py add_skills
 
-EXPOSE 8000
 CMD ["gunicorn", "config.wsgi", "-c", "config/gunicorn.conf.py"]
