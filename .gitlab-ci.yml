@@ -7,6 +7,7 @@ variables:
 
 stages:
   - init
+  - install_docker
   - deploy
   - reset_db
 
@@ -26,6 +27,19 @@ stages:
     - $SSH_COMMAND "sudo systemctl enable --now podman"
     - echo "CREATING FOLDER IF NOT EXIST ON CT"
     - $SSH_COMMAND "mkdir -p /data/logs /data/db /data/staticfiles /data/docker"
+
+.install_docker: &install_docker
+    - echo "ADDING DOCKER REPO"
+    - $SSH_COMMAND "sudo apt install ca-certificates curl"
+    - $SSH_COMMAND "sudo install -m 0755 -d /etc/apt/keyrings"
+    - $SSH_COMMAND "sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc"
+    - $SSH_COMMAND "echo \
+        "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+        $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+        sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    - $SSH_COMMAND "sudo apt update"
+    - echo "INSTALLING DOCKER"
+    - $SSH_COMMAND "sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin"
 
 .create_proxy: &create_proxy
     - echo "CREATING PROXY IF NOT EXISTS"
@@ -53,6 +67,16 @@ init_CT_job:
   script:
     - *ssh_prepare
     - *ct_prepare
+  allow_failure: false
+  needs: []
+  when: manual
+
+install_docker_job:
+  stage: install_docker
+  tags:
+    - ct_shell
+  script:
+    - *install_docker
   allow_failure: false
   needs: []
   when: manual
