@@ -69,6 +69,10 @@ stages:
         echo "ENABLING GUNICORN SERVICE" && 
         $SSH_COMMAND "sudo systemctl enable gunicorn.service"
     - echo "CONFIGURING INTERNAL NGINX PROXY"
+    - echo "TEST 1 $host"
+    - echo "TEST 2 $$host"
+    - echo "TEST 3 \$$host"
+    - echo "TEST 4 \$host"
     - |
         $SSH_COMMAND "sudo test -e /etc/nginx/sites-available/$PROJECT_NAME.conf || sudo tee /etc/nginx/sites-available/$PROJECT_NAME.conf > /dev/null << EOF
         events {}
@@ -84,9 +88,9 @@ stages:
 
             location / {
               proxy_pass http://127.0.0.1:8080;
-              proxy_set_header Host \$host;
-              proxy_set_header X-Real-IP \$remote_addr;
-              proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+              proxy_set_header Host \$$host;
+              proxy_set_header X-Real-IP \$$remote_addr;
+              proxy_set_header X-Forwarded-For \$$proxy_add_x_forwarded_for;
             }
             location /staticfiles {
                 alias /data/staticfiles;
@@ -118,9 +122,9 @@ stages:
 
             location / {
               proxy_pass http://django:8080;
-              proxy_set_header Host \$host;
-              proxy_set_header X-Real-IP \$remote_addr;
-              proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+              proxy_set_header Host \$$host;
+              proxy_set_header X-Real-IP \$$remote_addr;
+              proxy_set_header X-Forwarded-For \$$proxy_add_x_forwarded_for;
             }
             location /staticfiles {
                 alias /data/staticfiles;
