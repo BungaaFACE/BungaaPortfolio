@@ -29,7 +29,7 @@ stages:
     - echo "CT PYTHON3-PIP INSTALL"
     - $SSH_COMMAND "sudo apt -y install python3-pip python3.11-venv redis git nginx"
     - echo "UPDATING PIP SETUPTOOLS"
-    - $SSH_COMMAND "python3 -m pip install --upgrade pip setuptools"
+    - $SSH_COMMAND "python3 -m pip install --upgrade pip setuptools --break-system-packages"
     - echo "CREATING FOLDER IF NOT EXIST ON CT"
     - $SSH_COMMAND "mkdir -p $PROJECT_DIR"
     - echo "CREATING VENV ON CT"
