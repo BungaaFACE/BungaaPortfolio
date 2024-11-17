@@ -99,7 +99,7 @@ stages:
     - $SSH_COMMAND "sudo systemctl enable nginx"
     - $SSH_COMMAND "sudo systemctl restart nginx"
 
-.service_docker_prepare: &service_prepare
+.service_docker_prepare: &service_docker_prepare
     - echo "CONFIGURING INTERNAL NGINX PROXY"
     - |
         $SSH_COMMAND "sudo tee nginx.conf > /dev/null << EOF
@@ -213,6 +213,7 @@ install_packages_job:
     - ct_shell
   script:
     - *ct_prepare
+    - *service_prepare
   allow_failure: false
   needs: []
   when: manual
@@ -223,6 +224,7 @@ install_docker_job:
     - ct_shell
   script:
     - *install_docker
+    - *service_docker_prepare
   allow_failure: false
   needs: []
   when: manual
