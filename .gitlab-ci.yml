@@ -69,10 +69,22 @@ stages:
         echo "ENABLING GUNICORN SERVICE" && 
         $SSH_COMMAND "sudo systemctl enable gunicorn.service"
     - echo "CONFIGURING INTERNAL NGINX PROXY"
-    - tee /dev/null << \\$host
-    - tee /dev/null << \$host
-    - tee /dev/null << \\$$host
-    - tee /dev/null << \$$host
+    - |
+        tee /dev/null << EOF
+        \\$host
+        EOF
+    - |
+        tee /dev/null << EOF
+        \$host
+        EOF
+    - |
+        tee /dev/null << EOF
+        \\$$host
+        EOF
+    - |
+        tee /dev/null << EOF
+        \$$host
+        EOF
     - |
         $SSH_COMMAND "sudo test -e /etc/nginx/sites-available/$PROJECT_NAME.conf || sudo tee /etc/nginx/sites-available/$PROJECT_NAME.conf << EOF
         events {}
