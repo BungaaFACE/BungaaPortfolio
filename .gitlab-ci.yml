@@ -96,7 +96,7 @@ stages:
         }
         EOF"
     - echo "CREATING SOFT LINK TO SITES-ENABLED FOR PROXY CONFIG"
-    - $SSH_COMMAND "sudo ln -s /etc/nginx/sites-available/$PROJECT_NAME.conf /etc/nginx/sites-enabled/$PROJECT_NAME.conf"
+    - $SSH_COMMAND "sudo ln -s /etc/nginx/sites-available/$PROJECT_NAME.conf /etc/nginx/sites-enabled/$PROJECT_NAME.conf || true"
     - echo "ENABLING AND STARTING NGINX SERVICE"
     - $SSH_COMMAND "sudo systemctl enable nginx"
     - $SSH_COMMAND "sudo systemctl restart nginx"
