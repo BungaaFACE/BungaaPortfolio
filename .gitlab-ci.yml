@@ -141,7 +141,7 @@ stages:
     - echo "INSTALLING REQUIREMENTS TO CT"
     - ssh $CT_USER@$REMOTE_SERVER "$PROJECT_DIR/.venv/bin/pip install -r $PROJECT_DIR/requirements.txt"
     - echo "CREATING DB FOLDER"
-    - ssh $CT_USER@$REMOTE_SERVER "mkdir $PROJECT_DIR/db"
+    - ssh $CT_USER@$REMOTE_SERVER "mkdir -p $PROJECT_DIR/db"
 
 .django_pre: &django_pre
     - echo "MIGRATING LAST DB CHANGES"
