@@ -151,7 +151,7 @@ stages:
     - echo "ADDING SKILLS TO DB"
     - $SSH_COMMAND "cd $PROJECT_DIR && ./.venv/bin/python manage.py add_skills"
 
-.update_docker_script: &update_script
+.update_docker_script: &update_docker_script
     - echo "SENDING LAST VERSION TO CT"
     - /usr/bin/sftp -r $CT_USER@$REMOTE_SERVER:/data/docker/ <<< $'put ./*'
 
