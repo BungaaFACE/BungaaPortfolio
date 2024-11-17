@@ -195,7 +195,7 @@ prepare_ssh_job:
   needs: []
   when: manual
 
-prepare_ssh_job:
+prepare_ssh_docker_job:
   stage: init_docker
   tags:
     - ct_shell
@@ -260,7 +260,7 @@ external_proxy_job:
   needs: []
   when: manual
 
-external_proxy_job:
+external_proxy_docker_job:
   stage: deploy_docker
   tags:
     - ct_shell
