@@ -70,7 +70,7 @@ stages:
         $SSH_COMMAND "sudo systemctl enable gunicorn.service"
     - echo "CONFIGURING INTERNAL NGINX PROXY"
     - |
-        $SSH_COMMAND "sudo test -e /etc/nginx/sites-available/$PROJECT_NAME.conf || sudo tee /etc/nginx/sites-available/$PROJECT_NAME.conf > /dev/null << EOF
+        $SSH_COMMAND "sudo test -e /etc/nginx/sites-available/$PROJECT_NAME.conf || sudo tee /etc/nginx/sites-available/$PROJECT_NAME.conf << EOF
         events {}
         http {
           server {
