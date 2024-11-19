@@ -26,9 +26,9 @@
                         приложений и создания Telegram-ботов
                     </p>
                     <ul>
-                        <li>+7 (916) XXX XX-XX</li>
-                        <li><a href="https://t.me/BungaaFACE" class="telegram">TG: @BungaaFACE</a></li>
-                        <li><a href="mailto:vladislav0218@gmail.com" class="email">vladislav0218@gmail.com</a></li>
+                        <li><a href="https://t.me/BungaaFACE" target="_blank" class="telegram">TG: @BungaaFACE</a></li>
+                        <li><a href="https://wa.me/qr/FRIDGIOXAAB4N1" target="_blank" class="telegram">WhatsApp</a></li>
+                        <li><a href="mailto:vladislav0218@gmail.com" target="_blank" class="email">vladislav0218@gmail.com</a></li>
                     </ul>
                 </div>
 
@@ -63,7 +63,7 @@
                 <h5>Проекты</h5>
                     {% for proj in exp.experienceproject_set.all %}
                         {% if proj.link %}
-                        <h6><a href="{{ proj.link }}">{{ proj.name }}</a></h6>
+                        <h6><a href="{{ proj.link }}" target="_blank">{{ proj.name }}</a></h6>
                         {% else %}
                         <h6>{{ proj.name }}</h6>
                         {% endif %}

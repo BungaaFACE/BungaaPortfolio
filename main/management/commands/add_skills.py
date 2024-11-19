@@ -11,6 +11,7 @@ class Command(BaseCommand):
         orm, _ = SkillCategory.objects.get_or_create(name='ORM')
         multitasking, _ = SkillCategory.objects.get_or_create(name='Мультизадачность')
         tg_bots, _ = SkillCategory.objects.get_or_create(name='Telegram-боты')
+        deployment, _ = SkillCategory.objects.get_or_create(name='Развертывание')
         other, _ = SkillCategory.objects.get_or_create(name='Другое')
 
         Skill.objects.get_or_create(
@@ -82,6 +83,17 @@ class Command(BaseCommand):
             name='Telethon',
             percent=90,
             category=tg_bots
+        )
+
+        Skill.objects.get_or_create(
+            name='Docker/docker-compose',
+            percent=90,
+            category=deployment
+        )
+        Skill.objects.get_or_create(
+            name='gitlab-pipeline',
+            percent=85,
+            category=deployment
         )
 
         Skill.objects.get_or_create(
