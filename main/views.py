@@ -1,5 +1,6 @@
 from django.shortcuts import render
-from main.models import Experience, SkillCategory
+from django.views.generic import ListView
+from main.models import Experience, ProjectTag, SkillCategory
 
 
 def main(request):
@@ -18,3 +19,10 @@ def skills(request):
         context_data[category.name] = list(category.skill_set.all())
 
     return render(request, 'main/skills.html', context={'context': context_data})
+
+
+class ProjectTagListView(ListView):
+    model = ProjectTag
+    context_object_name = 'tags'
+    template_name = 'main/project_tags.html'
+

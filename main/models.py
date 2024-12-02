@@ -44,16 +44,21 @@ class Experience(models.Model):
         verbose_name_plural = 'Experience'
 
 
-class ExperienceProject(models.Model):
+class ProjectTag(models.Model):
+    name = models.CharField(_("Тэг"), max_length=50)
+
+    class Meta:
+        verbose_name = 'Project Tag'
+        verbose_name_plural = 'Project Tags'
+
+
+class Project(models.Model):
     name = models.CharField(_("Название"), max_length=50)
     link = models.URLField(_("Ссылка"), max_length=200, **NULLABLE)
     description = models.TextField(_("Описание"))
     stack = models.CharField(_("Стэк"), max_length=50)
-    experience = models.ForeignKey("Experience", 
-                                   verbose_name=_("Опыт работы"), 
-                                   on_delete=models.CASCADE)
+    tags = models.ManyToManyField(ProjectTag)
 
     class Meta:
-        verbose_name = 'Experience project'
-        verbose_name_plural = 'Experience projects'
-
+        verbose_name = 'Project'
+        verbose_name_plural = 'Projects'
