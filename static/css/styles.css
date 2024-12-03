@@ -156,7 +156,9 @@ section {
     overflow-x: auto;
 }
 .nav-bar {
-    text-align:center;
+    text-align:justify;
+    text-justify: newspaper;
+    text-align-last: justify;
 }
 
 .nav-bar a {
@@ -208,11 +210,6 @@ section {
     #footer span{
         display: none;
     }
-    /* .nav-bar a {
-        margin: auto;
-        padding: 11px 7px 11px 7px;
-        list-style: none;
-    } */
 }
 
 /*--------------------------------------------------------------
