@@ -465,3 +465,35 @@ section {
     float: right;
     font-style: normal;
 }
+
+
+/*--------------------------------------------------------------
+# Projects
+--------------------------------------------------------------*/
+.projects-list {
+    margin-left: 25px;
+    margin-bottom: 0px;
+    display: none;
+    border-left: #149ddd solid 2px;
+}
+.projects-list h5 {
+    margin-bottom: 0px;
+    margin-left: 0px;
+    padding: 6px;
+}
+
+.project img {
+    max-height: 300px;
+    margin: 5px;
+}
+.project h5 {
+    margin-bottom: 0px;
+    margin-left: 0px;
+    padding: 6px;
+}
+
+.project-description {
+    padding: 5px;
+    border: #149ddd solid 2px;
+    border-radius: 15px;
+}

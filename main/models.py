@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from datetime import datetime
+from django.utils.text import slugify
+
+from main.services import get_unique_slag
 
 NULLABLE = {'blank': True, 'null': True}
 
@@ -54,11 +56,27 @@ class ProjectTag(models.Model):
 
 class Project(models.Model):
     name = models.CharField(_("Название"), max_length=50)
+    slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name="URL", **NULLABLE)
     link = models.URLField(_("Ссылка"), max_length=200, **NULLABLE)
     description = models.TextField(_("Описание"))
     stack = models.CharField(_("Стэк"), max_length=50)
+    demo = models.URLField(_("Ссылка"), max_length=200, **NULLABLE)
     tags = models.ManyToManyField(ProjectTag)
+
+    def save(self, *args, **kwargs):
+        if not self.id:
+            self.slug = get_unique_slag(Project, self.name)
+        super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = 'Project'
         verbose_name_plural = 'Projects'
+
+
+class ProjectImage(models.Model):
+    image = models.ImageField('Attachment', upload_to='img/')
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, verbose_name='Project representation')
+
+    class Meta:
+        verbose_name = 'Project Image'
+        verbose_name_plural = 'Project Images'

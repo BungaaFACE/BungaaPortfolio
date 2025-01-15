@@ -1,0 +1,32 @@
+{% extends 'main/layout.html' %}
+{% load static %}
+
+{% block head %}
+    <script type="text/javascript" src="{% static 'js/jquery-3.7.1.min.js' %}"></script>
+{% endblock head %}
+
+{% block main %}
+<section id="project" class="project">
+    <div class="container">
+        <div class="section-title">
+			<h2>{{ object.name }}</h2>
+		</div>
+
+        {% if object.projectimage_set.all %}
+            {% for image_instance in object.projectimage_set.all %}
+                <img src="{{ image_instance.image.url }}">
+            {% endfor %}
+        {% endif %}
+
+        <div class="project-description"><h5 style="white-space: pre-line"> <b>Описание:</b> {{ object.description }}</h5></div>
+        <h5><b>Стэк:</b> {{ object.stack }}</h5>
+        {% if object.demo %}
+            <h5 style="white-space: pre-line"><b>DEMO:</b> {{ object.demo }}</h5>
+        {% endif %}
+        <h5 style="white-space: pre-line"><b>Source code:</b> {{ object.link }}</h5>
+
+
+	</div>
+</section>
+
+{% endblock %}

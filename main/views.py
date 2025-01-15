@@ -1,6 +1,6 @@
 from django.shortcuts import render
-from django.views.generic import ListView
-from main.models import Experience, ProjectTag, SkillCategory
+from django.views.generic import ListView, DetailView
+from main.models import Experience, Project, ProjectTag, SkillCategory
 
 
 def main(request):
@@ -26,3 +26,8 @@ class ProjectTagListView(ListView):
     context_object_name = 'tags'
     template_name = 'main/project_tags.html'
 
+
+class ProjectDetailView(DetailView):
+    model = Project
+    template_name = 'main/project_detail.html'
+    slug_url_kwarg = 'slug'
