@@ -172,7 +172,7 @@ stages:
 
 .reset_db: &reset_db
     - echo "DELETING EXISTING DB"
-    - $SSH_COMMAND "rm $PROJECT_DIR/db.sqlite3"
+    - $SSH_COMMAND "rm -f $PROJECT_DIR/db/db.sqlite3"
     - echo "MIGRATING LAST DB CHANGES"
     - $SSH_COMMAND "cd $PROJECT_DIR && ./.venv/bin/python manage.py migrate"
     - echo "ADDING EXPERIENCE TO DB"
