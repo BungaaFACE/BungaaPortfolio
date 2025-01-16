@@ -10,5 +10,6 @@ RUN python manage.py migrate
 RUN python manage.py collectstatic --noinput
 RUN python manage.py add_experience
 RUN python manage.py add_skills
+RUN python manage.py add_projects
 
 CMD ["gunicorn", "config.wsgi", "-c", "config/gunicorn.conf.py"]

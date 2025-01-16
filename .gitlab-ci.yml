@@ -150,6 +150,8 @@ stages:
     - $SSH_COMMAND "cd $PROJECT_DIR && ./.venv/bin/python manage.py add_experience"
     - echo "ADDING SKILLS TO DB"
     - $SSH_COMMAND "cd $PROJECT_DIR && ./.venv/bin/python manage.py add_skills"
+    - echo "ADDING TAGS AND PROJECTS TO DB"
+    - $SSH_COMMAND "cd $PROJECT_DIR && ./.venv/bin/python manage.py add_projects"
 
 .update_docker_script: &update_docker_script
     - echo "SENDING LAST VERSION TO CT"
@@ -179,6 +181,8 @@ stages:
     - $SSH_COMMAND "cd $PROJECT_DIR && ./.venv/bin/python manage.py add_experience"
     - echo "ADDING SKILLS TO DB"
     - $SSH_COMMAND "cd $PROJECT_DIR && ./.venv/bin/python manage.py add_skills"
+    - echo "ADDING TAGS AND PROJECTS TO DB"
+    - $SSH_COMMAND "cd $PROJECT_DIR && ./.venv/bin/python manage.py add_projects"
 
 .reset_docker_db: &reset_docker_db
     - echo "DELETING EXISTING DB"
