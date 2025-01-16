@@ -158,7 +158,7 @@ class Command(BaseCommand):
         bungaa_portfolio, _ = Project.objects.get_or_create(
             name = 'BungaaPortfolio',
             link = 'https://github.com/BungaaFACE/BungaaPortfolio',
-            description = '''Текущий сайт, сайт-визитка. Написано веб-приложение максимально просто с целью показать информацию обо мне и моих проектах, а никак не в целях показать сложные технические решения.''',
+            description = '''Текущий сайт, сайт-визитка. Написано веб-приложение максимально просто с целью показать информацию обо мне и моих проектах.''',
             stack = 'Django, SQLite3, Javascript, CSS, HTML, CI/CD, gunicorn, nginx, docker, docker-compose'
         )
         bungaa_portfolio.tags.add(*get_tags('Web-разработка', 'ORM', 'Deployment'))
